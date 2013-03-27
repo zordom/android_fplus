@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Main colors -->
+    <color name="main_bg">#FFF</color>
+
+    <!-- Center colors -->
+    <color name="center_text">#444</color>
+    <color name="center_hint">#888</color>
+
+    <!-- Splash screen -->
+    <color name="splash_bg_start">#00A8EC</color>
+    <color name="splash_bg_end">#006E9A</color>
+    <color name="splash_bg_border">#006E9A</color>
+    <color name="splash_text">#FFFFFF</color>
+    <color name="splash_text_shadow">#00405A</color>
+
+    <!-- Border colors -->
+    <color name="border_bg_start">#FFF</color>
+    <color name="border_bg_end">#EEE</color>
+    <color name="border_default">#888</color>
+    <color name="border_focused">#8CF</color>
+    <color name="border_bg_title_start">#CAE74A</color>
+    <color name="border_bg_title_end">#AACA00</color>
+
+    <!-- Button colors -->
+    <color name="button_bg_default_start">#CAE74A</color>
+    <color name="button_bg_default_end">#AACA00</color>
+    <color name="button_bg_pressed_start">#BC3</color>
+    <color name="button_bg_pressed_end">#8A0</color>
+    <color name="button_send_bg_default_start">#EEE</color>
+    <color name="button_send_bg_default_end">#CCC</color>
+    <color name="button_send_bg_pressed_start">#BBB</color>
+    <color name="button_send_bg_pressed_end">#999</color>
+    <color name="button_text">#444</color>
+    <color name="button_border">#888</color>
+    <color name="button_tint">#444</color>
+
+    <!-- Chat item -->
+    <color name="chat_item_link">#37589B</color>
+    <color name="chat_item_separator">#EEE</color>
+    <color name="chat_item_title">#37589B</color>
+    <color name="chat_item_message">#444</color>
+
+    <!-- Menu colors -->
+    <color name="menu_text">#888</color>
+    <color name="menu_hint">#555</color>
+
+</resources>

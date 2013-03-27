@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fi.harism.fplus.view.FeedListItem xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="@drawable/bg_feed_item" >
+
+        <LinearLayout
+            android:id="@+id/container_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFF00"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp" >
+
+            <View
+                android:id="@+id/view_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="#FF0000" />
+
+            <TextView
+                android:id="@+id/textview_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ITEM_TEXT"
+                android:textSize="30sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/button_plus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/container_header"
+            android:layout_centerHorizontal="true"
+            android:text="PlusMe" />
+    </RelativeLayout>
+
+</fi.harism.fplus.view.FeedListItem>
