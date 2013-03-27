@@ -13,17 +13,9 @@ import android.view.KeyEvent;
 import android.view.Window;
 
 public class SplashActivity extends Activity {
-	
+
 	private boolean mCancelLaunch;
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.layout_splash);
-		fadeTitle();
-	}
-	
+
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent event) {
 		if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
@@ -31,7 +23,7 @@ public class SplashActivity extends Activity {
 		}
 		return super.dispatchKeyEvent(event);
 	}
-	
+
 	private void fadeCaption() {
 		PropertyValuesHolder holderAlpha = PropertyValuesHolder.ofFloat(
 				"alpha", 0, 1);
@@ -62,7 +54,7 @@ public class SplashActivity extends Activity {
 						finish();
 						overridePendingTransition(android.R.anim.slide_in_left,
 								android.R.anim.slide_out_right);
-					}					
+					}
 				}, 2000);
 			}
 
@@ -108,6 +100,14 @@ public class SplashActivity extends Activity {
 		});
 
 		anim.start();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.layout_splash);
+		fadeTitle();
 	}
 
 }

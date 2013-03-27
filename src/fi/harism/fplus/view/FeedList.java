@@ -6,9 +6,9 @@ import android.view.MotionEvent;
 import android.widget.ListView;
 
 public class FeedList extends ListView {
-	
-	private float mTouchY;
+
 	private ScrollObserver mScrollObserver;
+	private float mTouchY;
 
 	public FeedList(Context context) {
 		super(context);
@@ -21,11 +21,11 @@ public class FeedList extends ListView {
 	public FeedList(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
-	
+
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		if (super.dispatchTouchEvent(event)) {
-			switch(event.getAction()) {
+			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 				mTouchY = event.getY();
 				break;
@@ -43,14 +43,15 @@ public class FeedList extends ListView {
 		}
 		return false;
 	}
-	
+
 	public void setScrollObserver(ScrollObserver scrollObserver) {
 		mScrollObserver = scrollObserver;
 	}
-	
+
 	public interface ScrollObserver {
-		public void onScrollUp();
 		public void onScrollDown();
+
+		public void onScrollUp();
 	}
 
 }
