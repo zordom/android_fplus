@@ -4,24 +4,29 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_splash" >
 
-    <TextView
-        style="@style/text_splash_title"
-        android:id="@+id/textview_splash_title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:alpha="0"
-        android:text="@string/splash_title" />
+        android:gravity="center"
+        android:orientation="vertical" >
 
-    <TextView
-        android:alpha="0"
-        style="@style/text_splash_caption"
-        android:id="@+id/textview_splash_caption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textview_splash_title"
-        android:layout_centerHorizontal="true"
-        android:text="@string/splash_caption" />
+        <TextView
+            android:id="@+id/textview_splash_title"
+            style="@style/text_splash_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0"
+            android:text="@string/splash_title" />
+
+        <TextView
+            android:id="@+id/textview_splash_caption"
+            style="@style/text_splash_caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0"
+            android:text="@string/splash_caption" />
+    </LinearLayout>
 
 </RelativeLayout>

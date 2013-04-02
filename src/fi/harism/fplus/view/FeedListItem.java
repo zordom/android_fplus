@@ -7,8 +7,15 @@ import android.animation.TypeEvaluator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.facebook.Session;
+
 import fi.harism.fplus.R;
+import fi.harism.fplus.data.FeedItemData;
 
 public class FeedListItem extends LinearLayout {
 
@@ -24,50 +31,140 @@ public class FeedListItem extends LinearLayout {
 		super(context, attrs, defStyle);
 	}
 
-	private Animator getBounceAnimator(View v, float scale) {
-		PropertyValuesHolder scaleXHolder, scaleYHolder;
-		scaleXHolder = PropertyValuesHolder.ofFloat("scaleX", 1f, scale);
-		scaleYHolder = PropertyValuesHolder.ofFloat("scaleY", 1f, scale);
-		scaleXHolder.setEvaluator(new BounceFloatEvaluator());
-		scaleYHolder.setEvaluator(new BounceFloatEvaluator());
-		return ObjectAnimator.ofPropertyValuesHolder(v, scaleXHolder,
-				scaleYHolder);
+	private void bounceButton(CompoundButton button) {
+		PropertyValuesHolder scaleXHolder, scaleYHolder, translationYHolder;
+		scaleXHolder = PropertyValuesHolder.ofFloat("scaleX", 1f, 2f);
+		scaleYHolder = PropertyValuesHolder.ofFloat("scaleY", 1f, 2f);
+		translationYHolder = PropertyValuesHolder.ofFloat("translationY", 0f,
+				-50f);
+		scaleXHolder.setEvaluator(new HalfSinFloatEvaluator());
+		scaleYHolder.setEvaluator(new HalfSinFloatEvaluator());
+		translationYHolder.setEvaluator(new HalfSinFloatEvaluator());
+		Animator anim = ObjectAnimator.ofPropertyValuesHolder(button,
+				scaleXHolder, scaleYHolder, translationYHolder);
+		anim.setDuration(400);
+		anim.addListener(new Animator.AnimatorListener() {
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				PropertyValuesHolder scaleXHolder, scaleYHolder;
+				scaleXHolder = PropertyValuesHolder.ofFloat("scaleX", 1f, 0.9f);
+				scaleYHolder = PropertyValuesHolder.ofFloat("scaleY", 1f, 0.9f);
+				scaleXHolder.setEvaluator(new DoubleSinFloatEvaluator());
+				scaleYHolder.setEvaluator(new DoubleSinFloatEvaluator());
+				Animator anim = ObjectAnimator.ofPropertyValuesHolder(
+						FeedListItem.this, scaleXHolder, scaleYHolder);
+				anim.setDuration(400);
+				anim.start();
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationStart(Animator animation) {
+			}
+		});
+		anim.start();
 	}
 
 	@Override
 	public void onFinishInflate() {
 		super.onFinishInflate();
 
-		findViewById(R.id.button_plus).setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						Animator anim = getBounceAnimator(v, 1.5f);
-						anim.setDuration(300);
-						anim.addListener(new Animator.AnimatorListener() {
-							@Override
-							public void onAnimationCancel(Animator animation) {
-							}
+		CompoundButton b = (CompoundButton) findViewById(R.id.button_comment);
+		b.setButtonDrawable(R.drawable.bg_transparent);
+		b.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				CompoundButton b = (CompoundButton) v;
+				b.setChecked(false);
+			}
+		});
 
-							@Override
-							public void onAnimationEnd(Animator animation) {
-								Animator anim = getBounceAnimator(
-										FeedListItem.this, 0.95f);
-								anim.setDuration(300);
-								anim.start();
-							}
+		b = (CompoundButton) findViewById(R.id.button_plus);
+		b.setButtonDrawable(R.drawable.bg_transparent);
+		b.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				CompoundButton b = (CompoundButton) v;
+				if (!b.isChecked()) {
+					// TODO: Unplus.
+					return;
+				}
+				// TODO: Plus.
+				bounceButton(b);
+			}
+		});
+	}
 
-							@Override
-							public void onAnimationRepeat(Animator animation) {
-							}
+	public void setData(FeedItemData itemData) {
+		ProfileImageView profileImageView = (ProfileImageView) findViewById(R.id.imageview_profile_picture);
+		profileImageView.setImageURL("http://graph.facebook.com/"
+				+ itemData.getFromId() + "/picture");
 
-							@Override
-							public void onAnimationStart(Animator animation) {
-							}
-						});
-						anim.start();
-					}
-				});
+		PostImageView postImageView = (PostImageView) findViewById(R.id.imageview_post_picture);
+		if (itemData.getObjectId() != null
+				&& itemData.getObjectId().trim().length() > 0) {
+			postImageView.setVisibility(View.VISIBLE);
+			postImageView.setImageURL("https://graph.facebook.com/"
+					+ itemData.getObjectId() + "/picture?access_token="
+					+ Session.getActiveSession().getAccessToken());
+		} else if (itemData.getPicture() != null
+				&& itemData.getPicture().trim().length() > 0) {
+			postImageView.setVisibility(View.VISIBLE);
+			postImageView.setImageURL(itemData.getPicture());
+		} else {
+			postImageView.setVisibility(View.GONE);
+		}
+
+		TextView textView = (TextView) findViewById(R.id.textview_name);
+		textView.setText(itemData.getFromName());
+
+		textView = (TextView) findViewById(R.id.textview_message);
+		if (itemData.getMessage() != null
+				&& itemData.getMessage().trim().length() > 0) {
+			textView.setVisibility(View.VISIBLE);
+			textView.setText(itemData.getMessage());
+		} else {
+			textView.setVisibility(View.GONE);
+		}
+
+		textView = (TextView) findViewById(R.id.textview_story);
+		if (itemData.getStory() != null
+				&& itemData.getStory().trim().length() > 0) {
+			textView.setVisibility(View.VISIBLE);
+			textView.setText(itemData.getStory());
+		} else {
+			textView.setVisibility(View.GONE);
+		}
+
+		CheckBox checkBox = (CheckBox) findViewById(R.id.button_plus);
+		checkBox.setText("+" + itemData.getLikesCount());
+		checkBox.setChecked(itemData.getLiked());
+
+		checkBox = (CheckBox) findViewById(R.id.button_comment);
+		checkBox.setText("" + itemData.getCommentsCount());
+
+		long timeDiff = System.currentTimeMillis()
+				- itemData.getCreatedTime().getTime();
+		textView = (TextView) findViewById(R.id.textview_time);
+		if (timeDiff < 60 * 1000) {
+			textView.setText("Just now");
+		} else if (timeDiff < 60 * 60 * 1000) {
+			textView.setText(timeDiff / (60 * 1000) + " minutes ago");
+		} else if (timeDiff < 24 * 60 * 60 * 1000) {
+			textView.setText(timeDiff / (60 * 60 * 1000) + " hours ago");
+		} else if (timeDiff < 365 * 24 * 60 * 60 * 1000) {
+			textView.setText(timeDiff / (24 * 60 * 60 * 1000) + " days ago");
+		} else {
+			textView.setText(timeDiff / (365 * 24 * 60 * 60 * 1000)
+					+ " years ago");
+		}
 	}
 
 	public void setRotationX(float startAngle, float endAngle, long duration) {
@@ -90,14 +187,20 @@ public class FeedListItem extends LinearLayout {
 		anim.start();
 	}
 
-	private class BounceFloatEvaluator implements TypeEvaluator<Float> {
+	private class DoubleSinFloatEvaluator implements TypeEvaluator<Float> {
+		@Override
+		public Float evaluate(float fraction, Float startValue, Float endValue) {
+			double t = (1.0 - fraction) * Math.sin(fraction * Math.PI * 4.0);
+			return (float) (startValue + (endValue - startValue) * t);
+		}
+	}
 
+	private class HalfSinFloatEvaluator implements TypeEvaluator<Float> {
 		@Override
 		public Float evaluate(float fraction, Float startValue, Float endValue) {
 			double t = Math.sin(fraction * Math.PI);
 			return (float) (startValue + (endValue - startValue) * t);
 		}
-
 	}
 
 }

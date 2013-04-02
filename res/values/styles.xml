@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    
+
     <style name="text_splash">
         <item name="android:typeface">monospace</item>
         <item name="android:textColor">@color/splash_text</item>
         <item name="android:shadowRadius">2</item>
         <item name="android:shadowColor">@color/splash_text_shadow</item>
     </style>
-    
+
     <style name="text_splash_title" parent="text_splash">
         <item name="android:textSize">60sp</item>
     </style>
-    
+
     <style name="text_splash_caption" parent="text_splash">
         <item name="android:textSize">14sp</item>
     </style>
-    
+
 </resources>

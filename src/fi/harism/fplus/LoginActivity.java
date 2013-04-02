@@ -25,7 +25,9 @@ public class LoginActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		Session.OpenRequest openRequest = new Session.OpenRequest(this)
-				.setPermissions(Arrays.asList("read_stream")).setCallback(
+				.setPermissions(
+						Arrays.asList("read_stream", "friends_photos",
+								"friends_status")).setCallback(
 						new Session.StatusCallback() {
 							@Override
 							public void call(Session session,
@@ -46,8 +48,8 @@ public class LoginActivity extends Activity {
 							}
 						});
 		Session session = new Session.Builder(this).build();
-		Session.setActiveSession(session);
 		session.openForRead(openRequest);
+		Session.setActiveSession(session);
 	}
 
 }

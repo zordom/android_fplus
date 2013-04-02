@@ -27,9 +27,11 @@ public class SplashActivity extends Activity {
 	private void fadeCaption() {
 		PropertyValuesHolder holderAlpha = PropertyValuesHolder.ofFloat(
 				"alpha", 0, 1);
+		PropertyValuesHolder holderTranslation = PropertyValuesHolder.ofFloat(
+				"translationX", 200, 0);
 		ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(
-				findViewById(R.id.textview_splash_caption), holderAlpha)
-				.setDuration(500);
+				findViewById(R.id.textview_splash_caption), holderAlpha,
+				holderTranslation).setDuration(500);
 
 		anim.addListener(new Animator.AnimatorListener() {
 			@Override
@@ -73,9 +75,11 @@ public class SplashActivity extends Activity {
 	private void fadeTitle() {
 		PropertyValuesHolder holderAlpha = PropertyValuesHolder.ofFloat(
 				"alpha", 0, 1);
+		PropertyValuesHolder holderTranslation = PropertyValuesHolder.ofFloat(
+				"translationX", -200, 0);
 		ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(
-				findViewById(R.id.textview_splash_title), holderAlpha)
-				.setDuration(500);
+				findViewById(R.id.textview_splash_title), holderAlpha,
+				holderTranslation).setDuration(500);
 
 		anim.addListener(new Animator.AnimatorListener() {
 			@Override
