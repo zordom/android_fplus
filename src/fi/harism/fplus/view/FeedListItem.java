@@ -108,7 +108,8 @@ public class FeedListItem extends LinearLayout {
 				+ itemData.getFromId() + "/picture");
 
 		PostImageView postImageView = (PostImageView) findViewById(R.id.imageview_post_picture);
-		if (itemData.getObjectId() != null
+		if (!"shared_story".equals(itemData.getStatusType())
+				&& itemData.getObjectId() != null
 				&& itemData.getObjectId().trim().length() > 0) {
 			postImageView.setVisibility(View.VISIBLE);
 			postImageView.setImageURL("https://graph.facebook.com/"

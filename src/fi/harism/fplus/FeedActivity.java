@@ -46,6 +46,7 @@ public class FeedActivity extends Activity {
 		itemData.setStory(json.optString("story"));
 		itemData.setPicture(json.optString("picture"));
 		itemData.setObjectId(json.optString("object_id"));
+		itemData.setStatusType(json.optString("status_type"));
 
 		String createdTime = json.optString("created_time");
 		if (createdTime != null) {

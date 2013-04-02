@@ -16,6 +16,7 @@ public class FeedItemData {
 	private String mMessage;
 	private String mObjectId;
 	private String mPicture;
+	private String mStatusType;
 	private String mStory;
 	private String mType;
 	private Date mUpdatedTime;
@@ -66,6 +67,10 @@ public class FeedItemData {
 
 	public String getPicture() {
 		return mPicture;
+	}
+
+	public String getStatusType() {
+		return mStatusType;
 	}
 
 	public String getStory() {
@@ -126,6 +131,10 @@ public class FeedItemData {
 
 	public void setPicture(String picture) {
 		this.mPicture = picture;
+	}
+
+	public void setStatusType(String statusType) {
+		mStatusType = statusType;
 	}
 
 	public void setStory(String story) {
