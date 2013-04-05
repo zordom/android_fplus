@@ -6,6 +6,7 @@ public class FeedItemData {
 
 	private String mActionsComment;
 	private String mActionsLike;
+	private boolean mAnimateIn = true;
 	private int mCommentsCount;
 	private Date mCreatedTime;
 	private String mFromId;
@@ -27,6 +28,10 @@ public class FeedItemData {
 
 	public String getActionsLike() {
 		return mActionsLike;
+	}
+
+	public boolean getAnimateIn() {
+		return mAnimateIn;
 	}
 
 	public int getCommentsCount() {
@@ -91,6 +96,10 @@ public class FeedItemData {
 
 	public void setActionsLike(String actionsLike) {
 		this.mActionsLike = actionsLike;
+	}
+
+	public void setAnimateIn(boolean animateIn) {
+		mAnimateIn = animateIn;
 	}
 
 	public void setCommentsCount(int commentsCount) {

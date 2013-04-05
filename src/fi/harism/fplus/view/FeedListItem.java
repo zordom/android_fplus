@@ -11,9 +11,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.facebook.Session;
-
 import fi.harism.fplus.R;
 import fi.harism.fplus.data.FeedItemData;
 
@@ -104,20 +101,17 @@ public class FeedListItem extends LinearLayout {
 
 	public void setData(FeedItemData itemData) {
 		ProfileImageView profileImageView = (ProfileImageView) findViewById(R.id.imageview_profile_picture);
-		profileImageView.setImageURL("http://graph.facebook.com/"
-				+ itemData.getFromId() + "/picture");
+		profileImageView.setUserId(itemData.getFromId());
 
 		PostImageView postImageView = (PostImageView) findViewById(R.id.imageview_post_picture);
 		if (itemData.getObjectId() != null
 				&& itemData.getObjectId().trim().length() > 0) {
 			postImageView.setVisibility(View.VISIBLE);
-			postImageView.setImageURL("https://graph.facebook.com/"
-					+ itemData.getObjectId() + "/picture?access_token="
-					+ Session.getActiveSession().getAccessToken());
+			postImageView.setPhotoId(itemData.getObjectId());
 		} else if (itemData.getPicture() != null
 				&& itemData.getPicture().trim().length() > 0) {
 			postImageView.setVisibility(View.VISIBLE);
-			postImageView.setImageURL(itemData.getPicture());
+			postImageView.setPhotoURL(itemData.getPicture());
 		} else {
 			postImageView.setVisibility(View.GONE);
 		}

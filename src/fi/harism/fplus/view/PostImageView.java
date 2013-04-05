@@ -1,7 +1,5 @@
 package fi.harism.fplus.view;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.net.URL;
 
 import android.animation.ObjectAnimator;
@@ -12,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+import fi.harism.fplus.MainApplication;
 
 public class PostImageView extends ImageView {
 
@@ -29,39 +28,46 @@ public class PostImageView extends ImageView {
 		super(context, attrs, defStyle);
 	}
 
-	public void setImageURL(String url) {
+	public void setPhotoId(String photoId) {
 		setImageBitmap(null);
 
 		if (mLoadPictureTask != null) {
 			mLoadPictureTask.cancel(true);
 		}
-		mLoadPictureTask = new LoadPictureTask();
-		mLoadPictureTask.execute(url);
+		mLoadPictureTask = new LoadPictureTask(false);
+		mLoadPictureTask.execute(photoId);
+	}
+
+	public void setPhotoURL(String photoURL) {
+		setImageBitmap(null);
+
+		if (mLoadPictureTask != null) {
+			mLoadPictureTask.cancel(true);
+		}
+		mLoadPictureTask = new LoadPictureTask(true);
+		mLoadPictureTask.execute(photoURL);
 	}
 
 	private class LoadPictureTask extends AsyncTask<String, Integer, Bitmap> {
+
+		private boolean mPhotoIsURL;
+
+		public LoadPictureTask(boolean photoIsURL) {
+			mPhotoIsURL = photoIsURL;
+		}
 
 		@Override
 		protected Bitmap doInBackground(String... params) {
 
 			while (!isCancelled()) {
 				try {
-					URL url = new URL(params[0]);
-					InputStream is = url.openStream();
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					byte[] buffer = new byte[1024];
-					int read;
-					while ((read = is.read(buffer)) != -1) {
-						if (isCancelled()) {
-							is.close();
-							return null;
-						}
-						baos.write(buffer, 0, read);
+					if (mPhotoIsURL) {
+						URL url = new URL(params[0]);
+						return BitmapFactory.decodeStream(url.openStream());
+					} else {
+						return MainApplication.getNetworkCache()
+								.getStreamPhoto(params[0], true);
 					}
-					is.close();
-
-					return BitmapFactory.decodeByteArray(baos.toByteArray(), 0,
-							baos.size());
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
