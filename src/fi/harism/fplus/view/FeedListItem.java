@@ -5,16 +5,25 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.TypeEvaluator;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+
 import fi.harism.fplus.R;
 import fi.harism.fplus.data.FeedItemData;
 
 public class FeedListItem extends LinearLayout {
+
+	private FeedItemData mItemData;
+	private String mLikeId;
 
 	public FeedListItem(Context context) {
 		super(context);
@@ -90,16 +99,53 @@ public class FeedListItem extends LinearLayout {
 			public void onClick(View v) {
 				CompoundButton b = (CompoundButton) v;
 				if (!b.isChecked()) {
-					// TODO: Unplus.
-					return;
+					Request request = Request.newGraphPathRequest(
+							Session.getActiveSession(), mLikeId + "/likes",
+							new Request.Callback() {
+								@Override
+								public void onCompleted(Response response) {
+									mItemData.setLikesCount(mItemData
+											.getLikesCount() - 1);
+									CheckBox checkBox = (CheckBox) findViewById(R.id.button_plus);
+									checkBox.setText("+"
+											+ mItemData.getLikesCount());
+								}
+							});
+					Bundle parameters = new Bundle();
+					parameters.putString("method", "delete");
+					request.setParameters(parameters);
+					request.executeAsync();
+				} else {
+					Request request = Request.newPostRequest(
+							Session.getActiveSession(), mLikeId + "/likes",
+							null, new Request.Callback() {
+								@Override
+								public void onCompleted(Response response) {
+									mItemData.setLikesCount(mItemData
+											.getLikesCount() + 1);
+									CheckBox checkBox = (CheckBox) findViewById(R.id.button_plus);
+									checkBox.setText("+"
+											+ mItemData.getLikesCount());
+								}
+							});
+					request.executeAsync();
+					bounceButton(b);
 				}
-				// TODO: Plus.
-				bounceButton(b);
 			}
 		});
 	}
 
 	public void setData(FeedItemData itemData) {
+		mItemData = itemData;
+
+		if (itemData.getObjectId() != null
+				&& itemData.getObjectId().length() > 0) {
+			mLikeId = itemData.getObjectId();
+		} else {
+			String id = itemData.getId();
+			mLikeId = id.substring(id.lastIndexOf('_') + 1);
+		}
+
 		ProfileImageView profileImageView = (ProfileImageView) findViewById(R.id.imageview_profile_picture);
 		profileImageView.setUserId(itemData.getFromId());
 
