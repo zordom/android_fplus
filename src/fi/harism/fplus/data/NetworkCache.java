@@ -1,9 +1,11 @@
 package fi.harism.fplus.data;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Scanner;
+import java.util.Vector;
 
 import org.json.JSONObject;
 
@@ -25,10 +27,40 @@ public class NetworkCache {
 
 	private byte[] mBuffer = new byte[1024];
 	private Context mContext;
+	private Vector<NetworkObserver> mNetworkObservers = new Vector<NetworkObserver>();
 	private String mUserId;
 
 	public NetworkCache(Context context) {
 		mContext = context;
+		for (String file : mContext.fileList()) {
+			if (file.startsWith(TYPE_STREAMPHOTO)) {
+				mContext.deleteFile(file);
+			}
+		}
+	}
+
+	public void addNetworkObserver(NetworkObserver observer) {
+		if (!mNetworkObservers.contains(observer)) {
+			mNetworkObservers.add(observer);
+		}
+	}
+
+	public byte[] getByteArray(String dataURL) {
+		try {
+			int read = 0;
+			notifyNetworkObservers(true);
+			URL url = new URL(dataURL);
+			InputStream is = url.openStream();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			while ((read = is.read(mBuffer)) != -1) {
+				baos.write(mBuffer, 0, read);
+			}
+			notifyNetworkObservers(false);
+			return baos.toByteArray();
+		} catch (Exception ex) {
+			notifyNetworkObservers(false);
+		}
+		return null;
 	}
 
 	public String getHomeFeed(boolean useCache) {
@@ -42,6 +74,7 @@ public class NetworkCache {
 		}
 		try {
 			int read = 0;
+			notifyNetworkObservers(true);
 			String accessToken = Session.getActiveSession().getAccessToken();
 			URL url = new URL(
 					"https://graph.facebook.com/me/home?access_token="
@@ -55,8 +88,10 @@ public class NetworkCache {
 			is.close();
 			is = mContext.openFileInput(TYPE_HOMEFEED);
 			Scanner s = new Scanner(is).useDelimiter("\\A");
+			notifyNetworkObservers(false);
 			return s.hasNext() ? s.next() : "";
 		} catch (Exception ex) {
+			notifyNetworkObservers(false);
 			mContext.deleteFile(TYPE_HOMEFEED);
 		}
 		return null;
@@ -73,6 +108,7 @@ public class NetworkCache {
 		}
 		try {
 			int read = 0;
+			notifyNetworkObservers(true);
 			URL url = new URL("http://graph.facebook.com/" + id + "/picture");
 			InputStream is = url.openStream();
 			OutputStream os = mContext.openFileOutput(TYPE_PROFILEPICTURE + id,
@@ -82,8 +118,10 @@ public class NetworkCache {
 			}
 			is.close();
 			is = mContext.openFileInput(TYPE_PROFILEPICTURE + id);
+			notifyNetworkObservers(false);
 			return BitmapFactory.decodeStream(is);
 		} catch (Exception ex) {
+			notifyNetworkObservers(false);
 			mContext.deleteFile(TYPE_PROFILEPICTURE + id);
 		}
 		return null;
@@ -99,6 +137,7 @@ public class NetworkCache {
 		}
 		try {
 			int read = 0;
+			notifyNetworkObservers(true);
 			String accessToken = Session.getActiveSession().getAccessToken();
 			URL url = new URL("https://graph.facebook.com/" + id
 					+ "/picture?access_token=" + accessToken);
@@ -110,8 +149,10 @@ public class NetworkCache {
 			}
 			is.close();
 			is = mContext.openFileInput(TYPE_STREAMPHOTO + id);
+			notifyNetworkObservers(false);
 			return BitmapFactory.decodeStream(is);
 		} catch (Exception ex) {
+			notifyNetworkObservers(false);
 			mContext.deleteFile(TYPE_STREAMPHOTO + id);
 		}
 		return null;
@@ -119,6 +160,7 @@ public class NetworkCache {
 
 	public String getUserId() {
 		if (mUserId == null) {
+			notifyNetworkObservers(true);
 			Request request = Request.newGraphPathRequest(
 					Session.getActiveSession(), "me", null);
 			Bundle parameters = new Bundle();
@@ -130,7 +172,28 @@ public class NetworkCache {
 				JSONObject json = graphObject.getInnerJSONObject();
 				mUserId = json.optString("id");
 			}
+			notifyNetworkObservers(false);
 		}
 		return mUserId;
+	}
+
+	private void notifyNetworkObservers(boolean start) {
+		for (NetworkObserver observer : mNetworkObservers) {
+			if (start) {
+				observer.onNetworkStart();
+			} else {
+				observer.onNetworkFinish();
+			}
+		}
+	}
+
+	public void removeNetworkObserver(NetworkObserver observer) {
+		mNetworkObservers.remove(observer);
+	}
+
+	public interface NetworkObserver {
+		public void onNetworkFinish();
+
+		public void onNetworkStart();
 	}
 }

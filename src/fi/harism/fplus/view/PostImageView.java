@@ -1,7 +1,5 @@
 package fi.harism.fplus.view;
 
-import java.net.URL;
-
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Context;
@@ -62,8 +60,10 @@ public class PostImageView extends ImageView {
 			while (!isCancelled()) {
 				try {
 					if (mPhotoIsURL) {
-						URL url = new URL(params[0]);
-						return BitmapFactory.decodeStream(url.openStream());
+						byte[] data = MainApplication.getNetworkCache()
+								.getByteArray(params[0]);
+						return BitmapFactory.decodeByteArray(data, 0,
+								data.length);
 					} else {
 						return MainApplication.getNetworkCache()
 								.getStreamPhoto(params[0], true);

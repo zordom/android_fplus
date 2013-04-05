@@ -2,11 +2,13 @@ package fi.harism.fplus;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.LinearInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import fi.harism.fplus.data.FeedData;
@@ -19,12 +21,37 @@ public class FeedActivity extends Activity {
 
 	private FeedAdapter mFeedAdapter;
 	private FeedData mFeedData;
+	private NetworkObserver mNetworkObserver;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.layout_feed);
+
+		mNetworkObserver = new NetworkObserver();
+		MainApplication.getNetworkCache().addNetworkObserver(mNetworkObserver);
+
+		findViewById(R.id.button_refresh).setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								NetworkCache cache = MainApplication
+										.getNetworkCache();
+								mFeedData.setFeedItems(cache.getHomeFeed(false));
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										mFeedAdapter.notifyDataSetChanged();
+									}
+								});
+							}
+						}).start();
+					}
+				});
 
 		new Thread(new Runnable() {
 			@Override
@@ -51,6 +78,13 @@ public class FeedActivity extends Activity {
 				});
 			}
 		}).start();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		MainApplication.getNetworkCache().removeNetworkObserver(
+				mNetworkObserver);
 	}
 
 	private class FeedAdapter extends BaseAdapter {
@@ -103,6 +137,43 @@ public class FeedActivity extends Activity {
 			return feedListItem;
 		}
 
+	}
+
+	private class NetworkObserver implements NetworkCache.NetworkObserver {
+
+		private ObjectAnimator mRotationAnim;
+
+		public NetworkObserver() {
+			View v = findViewById(R.id.button_refresh);
+			PropertyValuesHolder rotation;
+			rotation = PropertyValuesHolder.ofFloat("rotation", 0, 360);
+			mRotationAnim = ObjectAnimator.ofPropertyValuesHolder(v, rotation);
+			mRotationAnim.setDuration(1000);
+			mRotationAnim.setRepeatCount(ValueAnimator.INFINITE);
+			mRotationAnim.setInterpolator(new LinearInterpolator());
+		}
+
+		@Override
+		public void onNetworkFinish() {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					findViewById(R.id.button_refresh).setClickable(true);
+					mRotationAnim.end();
+				}
+			});
+		}
+
+		@Override
+		public void onNetworkStart() {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					findViewById(R.id.button_refresh).setClickable(false);
+					mRotationAnim.start();
+				}
+			});
+		}
 	}
 
 	private class ScrollObserver implements FeedList.ScrollObserver {
