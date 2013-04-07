@@ -37,6 +37,8 @@ public class FeedData {
 		itemData.setPicture(json.optString("picture"));
 		itemData.setObjectId(json.optString("object_id"));
 		itemData.setStatusType(json.optString("status_type"));
+		itemData.setCaption(json.optString("caption"));
+		itemData.setIcon(json.optString("icon"));
 
 		String createdTime = json.optString("created_time");
 		if (createdTime != null) {

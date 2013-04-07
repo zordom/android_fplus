@@ -42,7 +42,7 @@ public class FeedListItem extends LinearLayout {
 		scaleXHolder = PropertyValuesHolder.ofFloat("scaleX", 1f, 2f);
 		scaleYHolder = PropertyValuesHolder.ofFloat("scaleY", 1f, 2f);
 		translationYHolder = PropertyValuesHolder.ofFloat("translationY", 0f,
-				-50f);
+				-100f);
 		scaleXHolder.setEvaluator(new HalfSinFloatEvaluator());
 		scaleYHolder.setEvaluator(new HalfSinFloatEvaluator());
 		translationYHolder.setEvaluator(new HalfSinFloatEvaluator());
@@ -162,6 +162,15 @@ public class FeedListItem extends LinearLayout {
 			postImageView.setVisibility(View.GONE);
 		}
 
+		postImageView = (PostImageView) findViewById(R.id.imageview_post_icon);
+		if (itemData.getIcon() != null
+				&& itemData.getIcon().trim().length() > 0) {
+			postImageView.setVisibility(View.VISIBLE);
+			postImageView.setPhotoURL(itemData.getIcon());
+		} else {
+			postImageView.setVisibility(View.GONE);
+		}
+
 		TextView textView = (TextView) findViewById(R.id.textview_name);
 		textView.setText(itemData.getFromName());
 
@@ -179,8 +188,13 @@ public class FeedListItem extends LinearLayout {
 				&& itemData.getStory().trim().length() > 0) {
 			textView.setVisibility(View.VISIBLE);
 			textView.setText(itemData.getStory());
+		} else if (itemData.getCaption() != null
+				&& itemData.getCaption().trim().length() > 0) {
+			textView.setVisibility(View.VISIBLE);
+			textView.setText(itemData.getCaption());
 		} else {
 			textView.setVisibility(View.GONE);
+			postImageView.setVisibility(View.GONE);
 		}
 
 		CheckBox checkBox = (CheckBox) findViewById(R.id.button_plus);

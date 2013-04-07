@@ -7,10 +7,12 @@ public class FeedItemData {
 	private String mActionsComment;
 	private String mActionsLike;
 	private boolean mAnimateIn = true;
+	private String mCaption;
 	private int mCommentsCount;
 	private Date mCreatedTime;
 	private String mFromId;
 	private String mFromName;
+	private String mIcon;
 	private String mId;
 	private boolean mLiked;
 	private int mLikesCount;
@@ -34,6 +36,10 @@ public class FeedItemData {
 		return mAnimateIn;
 	}
 
+	public String getCaption() {
+		return mCaption;
+	}
+
 	public int getCommentsCount() {
 		return mCommentsCount;
 	}
@@ -48,6 +54,10 @@ public class FeedItemData {
 
 	public String getFromName() {
 		return mFromName;
+	}
+
+	public String getIcon() {
+		return mIcon;
 	}
 
 	public String getId() {
@@ -102,6 +112,10 @@ public class FeedItemData {
 		mAnimateIn = animateIn;
 	}
 
+	public void setCaption(String caption) {
+		mCaption = caption;
+	}
+
 	public void setCommentsCount(int commentsCount) {
 		this.mCommentsCount = commentsCount;
 	}
@@ -116,6 +130,10 @@ public class FeedItemData {
 
 	public void setFromName(String fromName) {
 		this.mFromName = fromName;
+	}
+
+	public void setIcon(String icon) {
+		mIcon = icon;
 	}
 
 	public void setId(String id) {

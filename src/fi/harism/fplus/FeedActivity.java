@@ -126,11 +126,11 @@ public class FeedActivity extends Activity {
 				ListView listView = (ListView) parent;
 				if (listView.getFirstVisiblePosition() > position) {
 					feedListItem.setRotationX(-30f, 0f, 300);
-					feedListItem.setTranslationY(-100, 0, 300);
+					feedListItem.setTranslationY(-200, 0, 300);
 				}
 				if (listView.getLastVisiblePosition() < position) {
 					feedListItem.setRotationX(30f, 0f, 300);
-					feedListItem.setTranslationY(100, 0, 300);
+					feedListItem.setTranslationY(200, 0, 300);
 				}
 			}
 
