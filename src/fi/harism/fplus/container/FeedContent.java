@@ -1,5 +1,6 @@
 package fi.harism.fplus.container;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
@@ -197,13 +198,33 @@ public class FeedContent extends RelativeLayout {
 		private ObjectAnimator mRotationAnim;
 
 		public NetworkObserver() {
-			View v = findViewById(R.id.button_header_refresh);
+			View v = findViewById(R.id.imageview_header_refresh);
 			PropertyValuesHolder rotation;
 			rotation = PropertyValuesHolder.ofFloat("rotation", 0, 360);
 			mRotationAnim = ObjectAnimator.ofPropertyValuesHolder(v, rotation);
 			mRotationAnim.setDuration(1000);
 			mRotationAnim.setRepeatCount(ValueAnimator.INFINITE);
 			mRotationAnim.setInterpolator(new LinearInterpolator());
+			mRotationAnim.addListener(new Animator.AnimatorListener() {
+				@Override
+				public void onAnimationCancel(Animator animation) {
+				}
+
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					findViewById(R.id.button_header_refresh).setClickable(true);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animator animation) {
+				}
+
+				@Override
+				public void onAnimationStart(Animator animation) {
+					findViewById(R.id.button_header_refresh)
+							.setClickable(false);
+				}
+			});
 		}
 
 		@Override
@@ -211,7 +232,6 @@ public class FeedContent extends RelativeLayout {
 			post(new Runnable() {
 				@Override
 				public void run() {
-					findViewById(R.id.button_header_refresh).setClickable(true);
 					mRotationAnim.end();
 				}
 			});
@@ -222,8 +242,6 @@ public class FeedContent extends RelativeLayout {
 			post(new Runnable() {
 				@Override
 				public void run() {
-					findViewById(R.id.button_header_refresh)
-							.setClickable(false);
 					mRotationAnim.start();
 				}
 			});

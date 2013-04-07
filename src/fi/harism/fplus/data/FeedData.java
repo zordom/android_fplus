@@ -19,11 +19,11 @@ public class FeedData {
 		mUserId = userId;
 	}
 
-	public FeedItemData getFeedItem(int index) {
+	public synchronized FeedItemData getFeedItem(int index) {
 		return mFeedItems.get(index);
 	}
 
-	public int getFeedItemCount() {
+	public synchronized int getFeedItemCount() {
 		return mFeedItems.size();
 	}
 
@@ -83,7 +83,7 @@ public class FeedData {
 		mFeedItems.insertElementAt(itemData, index);
 	}
 
-	public void setFeedItems(String jsonString) {
+	public synchronized void setFeedItems(String jsonString) {
 		try {
 			mFeedItems.clear();
 			JSONObject main = new JSONObject(jsonString);
