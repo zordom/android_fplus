@@ -4,6 +4,6 @@
     <string name="app_id" translatable="false">573297616022008</string>
     <string name="splash_title" translatable="false">fPlus*</string>
     <string name="splash_caption" translatable="false">&lt;!--  designed for plussers --></string>
-    <string name="info_text" translatable="false">\n<b>About fPlus*</b>\n\nThis application was made by Harri Smått as an experiment on Facebook SDK. Application follows Google\'s social networking Android application as closely as possible.\n\n<b>Logs:</b></string>
+    <string name="info_text" translatable="false">\n<b>About fPlus*</b>\n\nThis application was made by Harri Smått as an experiment on Facebook SDK. Application follows Google\'s social networking Android application as closely as possible.\n\n<b>Application Log:</b></string>
 
 </resources>
