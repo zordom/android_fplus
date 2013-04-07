@@ -7,10 +7,16 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import fi.harism.fplus.R;
 
 public class FeedMain extends RelativeLayout {
+
+	private ViewGroup mContainerMenu;
+	private FeedContent mFeedContent;
+	private FeedInfo mFeedInfo;
+	private View mViewDisabled;
 
 	public FeedMain(Context context) {
 		super(context);
@@ -35,40 +41,67 @@ public class FeedMain extends RelativeLayout {
 	@Override
 	public void onFinishInflate() {
 		super.onFinishInflate();
+
+		mFeedContent = (FeedContent) findViewById(R.id.container_content);
+		mContainerMenu = (ViewGroup) findViewById(R.id.container_menu);
+		mFeedInfo = (FeedInfo) findViewById(R.id.container_info);
+		mViewDisabled = findViewById(R.id.view_disabled);
+
+		mContainerMenu.setVisibility(View.GONE);
+		mFeedInfo.setVisibility(View.GONE);
+		mFeedInfo.setOnTouchListener(new InfoTouchListener());
+		mViewDisabled.setVisibility(View.GONE);
+		mViewDisabled.setAlpha(0f);
 	}
 
 	public void setInfoVisible(boolean visible) {
-		View disabled = findViewById(R.id.view_disabled);
-		View info = findViewById(R.id.container_info);
+		float scrollWidth = getWidth() * 0.8f;
+		ViewGroup.LayoutParams layoutParams = mFeedInfo.getLayoutParams();
+		layoutParams.width = (int) (scrollWidth);
+		mFeedInfo.setLayoutParams(layoutParams);
 
 		if (visible) {
 			PropertyValuesHolder alpha, translation;
-			alpha = PropertyValuesHolder.ofFloat("alpha", 0f, 1f);
-			translation = PropertyValuesHolder.ofFloat("translationX",
-					info.getWidth(), 0f);
+			alpha = PropertyValuesHolder.ofFloat("alpha",
+					mViewDisabled.getAlpha(), 1f);
+
+			long duration = 500;
+			if (mFeedInfo.getVisibility() == View.VISIBLE) {
+				translation = PropertyValuesHolder.ofFloat("translationX",
+						mFeedInfo.getTranslationX(), 0);
+				duration = (long) (500 * mFeedInfo.getTranslationX() / scrollWidth);
+			} else {
+				translation = PropertyValuesHolder.ofFloat("translationX",
+						scrollWidth, 0);
+			}
 			ObjectAnimator alphaAnim = ObjectAnimator.ofPropertyValuesHolder(
-					disabled, alpha);
-			alphaAnim.setDuration(500);
-			alphaAnim.start();
+					mViewDisabled, alpha);
 			ObjectAnimator translationAnim = ObjectAnimator
-					.ofPropertyValuesHolder(info, translation);
-			translationAnim.setDuration(500);
+					.ofPropertyValuesHolder(mFeedInfo, translation);
+
+			alphaAnim.setDuration(duration);
+			translationAnim.setDuration(duration);
+			alphaAnim.start();
 			translationAnim.start();
 
-			disabled.setVisibility(View.VISIBLE);
-			info.setVisibility(View.VISIBLE);
+			mViewDisabled.setVisibility(View.VISIBLE);
+			mFeedInfo.setVisibility(View.VISIBLE);
 		} else {
 			PropertyValuesHolder alpha, translation;
-			alpha = PropertyValuesHolder.ofFloat("alpha", 1f, 0f);
-			translation = PropertyValuesHolder.ofFloat("translationX", 0f,
-					info.getWidth());
+			alpha = PropertyValuesHolder.ofFloat("alpha",
+					mViewDisabled.getAlpha(), 0f);
+			translation = PropertyValuesHolder.ofFloat("translationX",
+					mFeedInfo.getTranslationX(), scrollWidth);
 			ObjectAnimator alphaAnim = ObjectAnimator.ofPropertyValuesHolder(
-					disabled, alpha);
-			alphaAnim.setDuration(500);
-			alphaAnim.start();
+					mViewDisabled, alpha);
 			ObjectAnimator translationAnim = ObjectAnimator
-					.ofPropertyValuesHolder(info, translation);
-			translationAnim.setDuration(500);
+					.ofPropertyValuesHolder(mFeedInfo, translation);
+
+			long duration = (long) (500 * (scrollWidth - mFeedInfo
+					.getTranslationX()) / scrollWidth);
+			alphaAnim.setDuration(duration);
+			translationAnim.setDuration(duration);
+
 			translationAnim.addListener(new Animator.AnimatorListener() {
 				@Override
 				public void onAnimationCancel(Animator animation) {
@@ -76,10 +109,8 @@ public class FeedMain extends RelativeLayout {
 
 				@Override
 				public void onAnimationEnd(Animator animation) {
-					findViewById(R.id.view_disabled).setVisibility(
-							View.INVISIBLE);
-					findViewById(R.id.container_info).setVisibility(
-							View.INVISIBLE);
+					mViewDisabled.setVisibility(View.GONE);
+					mFeedInfo.setVisibility(View.GONE);
 				}
 
 				@Override
@@ -90,32 +121,38 @@ public class FeedMain extends RelativeLayout {
 				public void onAnimationStart(Animator animation) {
 				}
 			});
+			alphaAnim.start();
 			translationAnim.start();
 		}
 	}
 
 	public void setMenuVisible(boolean visible) {
-		View menu = findViewById(R.id.container_menu);
-		View content = findViewById(R.id.container_content);
+		float scrollWidth = getWidth() * 0.8f;
+		ViewGroup.LayoutParams layoutParams = mContainerMenu.getLayoutParams();
+		layoutParams.width = (int) (scrollWidth);
+		mContainerMenu.setLayoutParams(layoutParams);
 
 		if (visible) {
-			menu.setVisibility(View.VISIBLE);
-			content.setOnTouchListener(new ContentTouchListener());
+			mContainerMenu.setVisibility(View.VISIBLE);
+			mFeedContent.setOnTouchListener(new ContentTouchListener());
 			PropertyValuesHolder translation;
 			translation = PropertyValuesHolder.ofFloat("translationX",
-					content.getTranslationX(), menu.getWidth());
+					mFeedContent.getTranslationX(), scrollWidth);
 			ObjectAnimator translationAnim = ObjectAnimator
-					.ofPropertyValuesHolder(content, translation);
-			translationAnim.setDuration(500);
+					.ofPropertyValuesHolder(mFeedContent, translation);
+			translationAnim
+					.setDuration((long) (500 * (scrollWidth - mFeedContent
+							.getTranslationX()) / scrollWidth));
 			translationAnim.start();
 		} else {
-			content.setOnTouchListener(null);
+			mFeedContent.setOnTouchListener(null);
 			PropertyValuesHolder translation;
 			translation = PropertyValuesHolder.ofFloat("translationX",
-					content.getTranslationX(), 0f);
+					mFeedContent.getTranslationX(), 0f);
 			ObjectAnimator translationAnim = ObjectAnimator
-					.ofPropertyValuesHolder(content, translation);
-			translationAnim.setDuration(500);
+					.ofPropertyValuesHolder(mFeedContent, translation);
+			translationAnim.setDuration((long) (500 * mFeedContent
+					.getTranslationX() / scrollWidth));
 			translationAnim.addListener(new Animator.AnimatorListener() {
 				@Override
 				public void onAnimationCancel(Animator animation) {
@@ -123,8 +160,7 @@ public class FeedMain extends RelativeLayout {
 
 				@Override
 				public void onAnimationEnd(Animator animation) {
-					findViewById(R.id.container_menu).setVisibility(
-							View.INVISIBLE);
+					findViewById(R.id.container_menu).setVisibility(View.GONE);
 				}
 
 				@Override
@@ -154,18 +190,15 @@ public class FeedMain extends RelativeLayout {
 			case MotionEvent.ACTION_MOVE: {
 				mMoveX = mStartX - event.getX();
 
-				View content = findViewById(R.id.container_content);
-				View menu = findViewById(R.id.container_menu);
-
-				float translationX = content.getTranslationX() - mMoveX;
+				float translationX = mFeedContent.getTranslationX() - mMoveX;
 				if (translationX < 0) {
 					translationX = 0;
 				}
-				if (translationX >= menu.getWidth()) {
-					translationX = menu.getWidth();
+				if (translationX >= mContainerMenu.getWidth()) {
+					translationX = mContainerMenu.getWidth();
 				}
 
-				content.setTranslationX(translationX);
+				mFeedContent.setTranslationX(translationX);
 				break;
 			}
 			case MotionEvent.ACTION_UP: {
@@ -173,6 +206,47 @@ public class FeedMain extends RelativeLayout {
 					setMenuVisible(true);
 				} else {
 					setMenuVisible(false);
+				}
+				break;
+			}
+			}
+
+			return true;
+		}
+
+	}
+
+	private class InfoTouchListener implements View.OnTouchListener {
+
+		private float mMoveX;
+		private float mStartX;
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			switch (event.getActionMasked()) {
+			case MotionEvent.ACTION_DOWN: {
+				mStartX = event.getX();
+				break;
+			}
+			case MotionEvent.ACTION_MOVE: {
+				mMoveX = mStartX - event.getX();
+
+				float translationX = mFeedInfo.getTranslationX() - mMoveX;
+				if (translationX < 0) {
+					translationX = 0;
+				}
+				if (translationX >= mFeedInfo.getWidth()) {
+					translationX = mFeedInfo.getWidth();
+				}
+
+				mFeedInfo.setTranslationX(translationX);
+				break;
+			}
+			case MotionEvent.ACTION_UP: {
+				if (mMoveX > 0) {
+					setInfoVisible(true);
+				} else {
+					setInfoVisible(false);
 				}
 				break;
 			}

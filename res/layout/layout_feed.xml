@@ -6,11 +6,10 @@
 
     <include
         android:id="@+id/container_menu"
-        layout="@layout/layout_feed_menu"
-        android:visibility="invisible" />
+        layout="@layout/layout_feed_menu" />
 
     <fi.harism.fplus.container.FeedContent
-     android:id="@+id/container_content"
+        android:id="@+id/container_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#CCCCCC" >
@@ -47,24 +46,59 @@
             android:layout_height="match_parent"
             android:layout_below="@id/view_separator"
             android:background="#80000000"
-            android:clickable="true"
-            android:visibility="invisible" />
+            android:clickable="true" />
 
-        <LinearLayout
+        <fi.harism.fplus.container.FeedInfo
             android:id="@+id/container_info"
-            android:layout_width="250dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_below="@id/view_separator"
             android:background="#444444"
-            android:orientation="vertical"
-            android:visibility="invisible" >
+            android:orientation="vertical" >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ADSDASD SADASD DAS DASSD ASD ASDASDASDADSASDASDASASD DAD ASD SAD AS AS DASDAS AAS DASASD AS SD AD ASD ASASDADSASASDAD ASSADS ASDAS  ASAD  ASA SDA S" />
-        </LinearLayout>
+                android:gravity="center"
+                android:text="@string/info_text" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ADSDASD SADASD DAS DASSD ASD ASDASDASDADSASDASDASASD DAD ASD SAD AS AS DASDAS AAS DASASD AS SD AD ASD ASASDADSASASDAD ASSADS ASDAS  ASAD  ASA SDA S" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ADSDASD SADASD DAS DASSD ASD ASDASDASDADSASDASDASASD DAD ASD SAD AS AS DASDAS AAS DASASD AS SD AD ASD ASASDADSASASDAD ASSADS ASDAS  ASAD  ASA SDA S" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ADSDASD SADASD DAS DASSD ASD ASDASDASDADSASDASDASASD DAD ASD SAD AS AS DASDAS AAS DASASD AS SD AD ASD ASASDADSASASDAD ASSADS ASDAS  ASAD  ASA SDA S" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ADSDASD SADASD DAS DASSD ASD ASDASDASDADSASDASDASASD DAD ASD SAD AS AS DASDAS AAS DASASD AS SD AD ASD ASASDADSASASDAD ASSADS ASDAS  ASAD  ASA SDA S" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ADSDASD SADASD DAS DASSD ASD ASDASDASDADSASDASDASASD DAD ASD SAD AS AS DASDAS AAS DASASD AS SD AD ASD ASASDADSASASDAD ASSADS ASDAS  ASAD  ASA SDA S" />
+                </LinearLayout>
+            </ScrollView>
+        </fi.harism.fplus.container.FeedInfo>
     </fi.harism.fplus.container.FeedContent>
 
 </fi.harism.fplus.container.FeedMain>
