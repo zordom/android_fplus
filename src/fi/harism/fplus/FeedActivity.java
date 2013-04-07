@@ -51,6 +51,7 @@ public class FeedActivity extends Activity {
 			case R.id.button_footer_info:
 				mFeedMain.setInfoVisible(true);
 				break;
+			case R.id.button_footer_chat:
 			case R.id.button_header_menu:
 				mFeedMain.setMenuVisible(true);
 				mFeedMain.setInfoVisible(false);
