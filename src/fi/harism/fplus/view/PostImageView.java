@@ -7,12 +7,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 import fi.harism.fplus.MainApplication;
 
 public class PostImageView extends ImageView {
 
 	private LoadPictureTask mLoadPictureTask;
+	private int mWidth, mHeight;
 
 	public PostImageView(Context context) {
 		super(context);
@@ -26,8 +28,20 @@ public class PostImageView extends ImageView {
 		super(context, attrs, defStyle);
 	}
 
+	@Override
+	public void onMeasure(int w, int h) {
+		int width = View.MeasureSpec.getSize(w);
+		if (mHeight != 0 && mWidth != 0) {
+			setMeasuredDimension(width,
+					(int) (width * ((float) mHeight / mWidth)));
+		} else {
+			setMeasuredDimension(width, 0);
+		}
+	}
+
 	public void setPhotoId(String photoId) {
 		setImageBitmap(null);
+		mWidth = mHeight = 0;
 
 		if (mLoadPictureTask != null) {
 			mLoadPictureTask.cancel(true);
@@ -38,6 +52,7 @@ public class PostImageView extends ImageView {
 
 	public void setPhotoURL(String photoURL) {
 		setImageBitmap(null);
+		mWidth = mHeight = 0;
 
 		if (mLoadPictureTask != null) {
 			mLoadPictureTask.cancel(true);
@@ -79,8 +94,9 @@ public class PostImageView extends ImageView {
 		protected void onPostExecute(Bitmap bitmap) {
 			mLoadPictureTask = null;
 			if (bitmap != null) {
+				mWidth = bitmap.getWidth();
+				mHeight = bitmap.getHeight();
 				setImageBitmap(bitmap);
-
 				PropertyValuesHolder holderAlpha = PropertyValuesHolder
 						.ofFloat("alpha", 0, 1);
 				ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(

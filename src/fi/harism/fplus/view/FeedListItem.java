@@ -6,6 +6,7 @@ import android.animation.PropertyValuesHolder;
 import android.animation.TypeEvaluator;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
@@ -104,8 +105,7 @@ public class FeedListItem extends LinearLayout {
 							new Request.Callback() {
 								@Override
 								public void onCompleted(Response response) {
-									mItemData.setLikesCount(mItemData
-											.getLikesCount() - 1);
+									mItemData.setSelfLike(false);
 									CheckBox checkBox = (CheckBox) findViewById(R.id.button_plus);
 									checkBox.setText("+"
 											+ mItemData.getLikesCount());
@@ -121,8 +121,7 @@ public class FeedListItem extends LinearLayout {
 							null, new Request.Callback() {
 								@Override
 								public void onCompleted(Response response) {
-									mItemData.setLikesCount(mItemData
-											.getLikesCount() + 1);
+									mItemData.setSelfLike(true);
 									CheckBox checkBox = (CheckBox) findViewById(R.id.button_plus);
 									checkBox.setText("+"
 											+ mItemData.getLikesCount());
@@ -197,9 +196,29 @@ public class FeedListItem extends LinearLayout {
 			postImageView.setVisibility(View.GONE);
 		}
 
+		textView = (TextView) findViewById(R.id.textview_shared_name);
+		if (itemData.getName() != null
+				&& itemData.getName().trim().length() > 0) {
+			textView.setVisibility(View.VISIBLE);
+			textView.setText(Html.fromHtml("<b>" + itemData.getName()
+					+ "</b> originally shared this"));
+		} else {
+			textView.setVisibility(View.GONE);
+		}
+
+		textView = (TextView) findViewById(R.id.textview_shared_text);
+		if (itemData.getDescription() != null
+				&& itemData.getDescription().trim().length() > 0) {
+			textView.setVisibility(View.VISIBLE);
+			textView.setText(itemData.getDescription());
+		} else {
+			textView.setVisibility(View.GONE);
+		}
+
 		CheckBox checkBox = (CheckBox) findViewById(R.id.button_plus);
 		checkBox.setText("+" + itemData.getLikesCount());
-		checkBox.setChecked(itemData.getLiked());
+		checkBox.setChecked(itemData.getSelfLike() == itemData
+				.getSelfLikeValue());
 
 		checkBox = (CheckBox) findViewById(R.id.button_comment);
 		checkBox.setText("" + itemData.getCommentsCount());

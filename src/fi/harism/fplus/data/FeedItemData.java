@@ -1,35 +1,25 @@
 package fi.harism.fplus.data;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class FeedItemData {
 
-	private String mActionsComment;
-	private String mActionsLike;
+	private static SimpleDateFormat mDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+	private static final String SELF_LIKE = "fplus_self_like";
+	private static final String SELF_LIKE_VALUE = "fplus_self_like_value";
 	private boolean mAnimateIn = true;
-	private String mCaption;
-	private int mCommentsCount;
-	private Date mCreatedTime;
-	private String mFromId;
-	private String mFromName;
-	private String mIcon;
-	private String mId;
-	private boolean mLiked;
-	private int mLikesCount;
-	private String mMessage;
-	private String mObjectId;
-	private String mPicture;
-	private String mStatusType;
-	private String mStory;
-	private String mType;
-	private Date mUpdatedTime;
+	private JSONObject mJSONObject;
 
-	public String getActionsComment() {
-		return mActionsComment;
-	}
-
-	public String getActionsLike() {
-		return mActionsLike;
+	public FeedItemData(JSONObject jsonObject) {
+		mJSONObject = jsonObject;
 	}
 
 	public boolean getAnimateIn() {
@@ -37,143 +27,123 @@ public class FeedItemData {
 	}
 
 	public String getCaption() {
-		return mCaption;
+		return mJSONObject.optString("caption");
 	}
 
 	public int getCommentsCount() {
-		return mCommentsCount;
+		JSONObject comments = mJSONObject.optJSONObject("comments");
+		if (comments != null) {
+			return comments.optInt("count");
+		}
+		return 0;
 	}
 
 	public Date getCreatedTime() {
-		return mCreatedTime;
+		try {
+			return mDateFormat.parse(mJSONObject.optString("created_time"));
+		} catch (ParseException e) {
+		}
+		return null;
+	}
+
+	public String getDescription() {
+		return mJSONObject.optString("description");
 	}
 
 	public String getFromId() {
-		return mFromId;
+		JSONObject from = mJSONObject.optJSONObject("from");
+		return from.optString("id");
 	}
 
 	public String getFromName() {
-		return mFromName;
+		JSONObject from = mJSONObject.optJSONObject("from");
+		return from.optString("name");
 	}
 
 	public String getIcon() {
-		return mIcon;
+		return mJSONObject.optString("icon");
 	}
 
 	public String getId() {
-		return mId;
-	}
-
-	public boolean getLiked() {
-		return mLiked;
+		return mJSONObject.optString("id");
 	}
 
 	public int getLikesCount() {
-		return mLikesCount;
+		int count = 0;
+		JSONObject likes = mJSONObject.optJSONObject("likes");
+		if (likes != null) {
+			count = likes.optInt("count");
+		}
+		return count + getSelfLike();
+	}
+
+	public String getLikesId(int index) {
+		JSONArray likes = mJSONObject.optJSONObject("likes").optJSONArray(
+				"data");
+		return likes.optJSONObject(index).optString("id");
 	}
 
 	public String getMessage() {
-		return mMessage;
+		return mJSONObject.optString("message");
+	}
+
+	public String getName() {
+		return mJSONObject.optString("name");
 	}
 
 	public String getObjectId() {
-		return mObjectId;
+		return mJSONObject.optString("object_id");
 	}
 
 	public String getPicture() {
-		return mPicture;
+		return mJSONObject.optString("picture");
+	}
+
+	public int getSelfLike() {
+		return mJSONObject.optInt(SELF_LIKE);
+	}
+
+	public int getSelfLikeValue() {
+		return mJSONObject.optInt(SELF_LIKE_VALUE);
 	}
 
 	public String getStatusType() {
-		return mStatusType;
+		return mJSONObject.optString("status_type");
 	}
 
 	public String getStory() {
-		return mStory;
+		return mJSONObject.optString("story");
 	}
 
 	public String getType() {
-		return mType;
+		return mJSONObject.optString("type");
 	}
 
 	public Date getUpdatedTime() {
-		return mUpdatedTime;
-	}
-
-	public void setActionsComment(String actionsComment) {
-		this.mActionsComment = actionsComment;
-	}
-
-	public void setActionsLike(String actionsLike) {
-		this.mActionsLike = actionsLike;
+		try {
+			return mDateFormat.parse(mJSONObject.optString("updated_time"));
+		} catch (ParseException e) {
+		}
+		return null;
 	}
 
 	public void setAnimateIn(boolean animateIn) {
 		mAnimateIn = animateIn;
 	}
 
-	public void setCaption(String caption) {
-		mCaption = caption;
+	public void setSelfLike(boolean selfLike) {
+		try {
+			int v = mJSONObject.optInt(SELF_LIKE_VALUE);
+			mJSONObject.put(SELF_LIKE, selfLike ? v : v - 1);
+		} catch (JSONException e) {
+		}
 	}
 
-	public void setCommentsCount(int commentsCount) {
-		this.mCommentsCount = commentsCount;
-	}
-
-	public void setCreatedTime(Date createdTime) {
-		this.mCreatedTime = createdTime;
-	}
-
-	public void setFromId(String fromId) {
-		this.mFromId = fromId;
-	}
-
-	public void setFromName(String fromName) {
-		this.mFromName = fromName;
-	}
-
-	public void setIcon(String icon) {
-		mIcon = icon;
-	}
-
-	public void setId(String id) {
-		this.mId = id;
-	}
-
-	public void setLiked(boolean liked) {
-		mLiked = liked;
-	}
-
-	public void setLikesCount(int likesCount) {
-		this.mLikesCount = likesCount;
-	}
-
-	public void setMessage(String message) {
-		this.mMessage = message;
-	}
-
-	public void setObjectId(String objectId) {
-		this.mObjectId = objectId;
-	}
-
-	public void setPicture(String picture) {
-		this.mPicture = picture;
-	}
-
-	public void setStatusType(String statusType) {
-		mStatusType = statusType;
-	}
-
-	public void setStory(String story) {
-		mStory = story;
-	}
-
-	public void setType(String type) {
-		this.mType = type;
-	}
-
-	public void setUpdatedTime(Date updatedTime) {
-		this.mUpdatedTime = updatedTime;
+	public void setSelfLikeValue(int selfLikeValue) {
+		try {
+			mJSONObject.put(SELF_LIKE_VALUE, selfLikeValue);
+		} catch (JSONException e) {
+		}
 	}
 
 }

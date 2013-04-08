@@ -8,6 +8,6 @@
         android:width="1px"
         android:color="#AAAAAA" />
 
-    <solid android:color="#EEEEEE" />
+    <solid android:color="#E8E8E8" />
 
 </shape>
