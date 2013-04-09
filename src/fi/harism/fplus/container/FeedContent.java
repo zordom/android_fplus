@@ -77,7 +77,7 @@ public class FeedContent extends RelativeLayout {
 				.setOnClickListener(buttonObserver);
 
 		mNetworkObserver = new NetworkObserver();
-		MainApplication.getNetworkCache().addNetworkObserver(mNetworkObserver);
+		//MainApplication.getNetworkCache().addNetworkObserver(mNetworkObserver);
 
 		mFeedAdapter = new FeedAdapter(getContext());
 		FeedList feedList = (FeedList) findViewById(R.id.feedlist);
@@ -124,6 +124,7 @@ public class FeedContent extends RelativeLayout {
 	}
 
 	private void updateFeedItems(boolean useCache) {
+		mNetworkObserver.onNetworkStart();
 		NetworkCache cache = MainApplication.getNetworkCache();
 		JSONObject homeFeed = cache.getHomeFeed(useCache);
 		if (homeFeed != null) {
@@ -143,6 +144,7 @@ public class FeedContent extends RelativeLayout {
 				}
 			}
 		}
+		mNetworkObserver.onNetworkFinish();
 	}
 
 	private class ButtonObserver implements View.OnClickListener {
@@ -184,8 +186,13 @@ public class FeedContent extends RelativeLayout {
 			}
 
 			FeedItemData feedItem = mFeedData.getFeedItem(position);
-			feedListItem.setData(feedItem);
+			
+			if (feedItem.getId().equals(feedListItem.getTag())) {
+				return feedListItem;
+			}
 
+			feedListItem.setTag(feedItem.getId());
+			feedListItem.setData(feedItem);
 			if (feedItem.getAnimateIn()) {
 				feedItem.setAnimateIn(false);
 				ListView listView = (ListView) parent;
