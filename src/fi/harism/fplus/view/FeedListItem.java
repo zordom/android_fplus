@@ -49,7 +49,7 @@ public class FeedListItem extends LinearLayout {
 		translationYHolder.setEvaluator(new HalfSinFloatEvaluator());
 		Animator anim = ObjectAnimator.ofPropertyValuesHolder(button,
 				scaleXHolder, scaleYHolder, translationYHolder);
-		anim.setDuration(400);
+		anim.setDuration(500);
 		anim.addListener(new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationCancel(Animator animation) {

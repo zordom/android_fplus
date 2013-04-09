@@ -2,7 +2,6 @@ package fi.harism.fplus.data;
 
 import java.util.Vector;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class FeedData {
@@ -14,6 +13,14 @@ public class FeedData {
 		mUserId = userId;
 	}
 
+	public void addFeedItem(JSONObject json) {
+		insertFeedItem(json, mFeedItems.size());
+	}
+
+	public synchronized void clearFeedItems() {
+		mFeedItems.clear();
+	}
+
 	public synchronized FeedItemData getFeedItem(int index) {
 		return mFeedItems.get(index);
 	}
@@ -22,7 +29,7 @@ public class FeedData {
 		return mFeedItems.size();
 	}
 
-	private void insertFeedItem(JSONObject json, int index) {
+	public void insertFeedItem(JSONObject json, int index) {
 		FeedItemData itemData = new FeedItemData(json);
 
 		itemData.setSelfLikeValue(1);
@@ -34,19 +41,6 @@ public class FeedData {
 		}
 
 		mFeedItems.insertElementAt(itemData, index);
-	}
-
-	public synchronized void setFeedItems(String jsonString) {
-		try {
-			mFeedItems.clear();
-			JSONObject main = new JSONObject(jsonString);
-			JSONArray data = main.getJSONArray("data");
-			for (int i = 0; i < data.length(); ++i) {
-				insertFeedItem(data.getJSONObject(i), mFeedItems.size());
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 }

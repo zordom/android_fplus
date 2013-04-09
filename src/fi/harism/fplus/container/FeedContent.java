@@ -1,5 +1,8 @@
 package fi.harism.fplus.container;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
@@ -76,6 +79,11 @@ public class FeedContent extends RelativeLayout {
 		mNetworkObserver = new NetworkObserver();
 		MainApplication.getNetworkCache().addNetworkObserver(mNetworkObserver);
 
+		mFeedAdapter = new FeedAdapter(getContext());
+		FeedList feedList = (FeedList) findViewById(R.id.feedlist);
+		feedList.setAdapter(mFeedAdapter);
+		feedList.setScrollObserver(new ScrollObserver());
+
 		findViewById(R.id.button_header_refresh).setOnClickListener(
 				new View.OnClickListener() {
 					@Override
@@ -83,15 +91,7 @@ public class FeedContent extends RelativeLayout {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
-								NetworkCache cache = MainApplication
-										.getNetworkCache();
-								mFeedData.setFeedItems(cache.getHomeFeed(false));
-								post(new Runnable() {
-									@Override
-									public void run() {
-										mFeedAdapter.notifyDataSetChanged();
-									}
-								});
+								updateFeedItems(false);
 							}
 						}).start();
 					}
@@ -103,23 +103,12 @@ public class FeedContent extends RelativeLayout {
 				NetworkCache cache = MainApplication.getNetworkCache();
 				String userId = cache.getUserId();
 				mFeedData = new FeedData(userId);
-				mFeedData.setFeedItems(cache.getHomeFeed(true));
-				post(new Runnable() {
-					@Override
-					public void run() {
-						mFeedAdapter = new FeedAdapter(getContext());
-						FeedList feedList = (FeedList) findViewById(R.id.feedlist);
-						feedList.setAdapter(mFeedAdapter);
-						feedList.setScrollObserver(new ScrollObserver());
-					}
-				});
-				mFeedData.setFeedItems(cache.getHomeFeed(false));
-				post(new Runnable() {
-					@Override
-					public void run() {
-						mFeedAdapter.notifyDataSetChanged();
-					}
-				});
+				updateFeedItems(true);
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+				}
+				updateFeedItems(false);
 			}
 		}).start();
 	}
@@ -132,6 +121,28 @@ public class FeedContent extends RelativeLayout {
 	public void setOnTouchListener(View.OnTouchListener touchListener) {
 		mTouchListener = touchListener;
 		super.setOnTouchListener(touchListener);
+	}
+
+	private void updateFeedItems(boolean useCache) {
+		NetworkCache cache = MainApplication.getNetworkCache();
+		JSONObject homeFeed = cache.getHomeFeed(useCache);
+		if (homeFeed != null) {
+			JSONArray homeFeedData = homeFeed.optJSONArray("data");
+			mFeedData.clearFeedItems();
+			for (int i = 0; i < homeFeedData.length(); ++i) {
+				String id = homeFeedData.optJSONObject(i).optString("id");
+				JSONObject json = cache.getHomeFeedItem(id, useCache);
+				if (json != null) {
+					mFeedData.addFeedItem(json);
+					post(new Runnable() {
+						@Override
+						public void run() {
+							mFeedAdapter.notifyDataSetChanged();
+						}
+					});
+				}
+			}
+		}
 	}
 
 	private class ButtonObserver implements View.OnClickListener {
@@ -151,7 +162,7 @@ public class FeedContent extends RelativeLayout {
 
 		@Override
 		public int getCount() {
-			return mFeedData.getFeedItemCount();
+			return mFeedData != null ? mFeedData.getFeedItemCount() : 0;
 		}
 
 		@Override

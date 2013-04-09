@@ -22,6 +22,7 @@ import com.facebook.model.GraphObject;
 public class NetworkCache {
 
 	private static final String TYPE_HOMEFEED = "homefeed";
+	private static final String TYPE_HOMEFEEDITEM = "homefeeditem_";
 	private static final String TYPE_PROFILEPICTURE = "profilepicture_";
 	private static final String TYPE_STREAMPHOTO = "streamphoto_";
 
@@ -63,36 +64,72 @@ public class NetworkCache {
 		return null;
 	}
 
-	public String getHomeFeed(boolean useCache) {
+	public JSONObject getHomeFeed(boolean useCache) {
 		if (useCache) {
 			try {
 				InputStream is = mContext.openFileInput(TYPE_HOMEFEED);
 				Scanner s = new Scanner(is).useDelimiter("\\A");
-				return s.hasNext() ? s.next() : "";
+				return new JSONObject(s.next());
 			} catch (Exception ex) {
 			}
 		}
 		try {
-			int read = 0;
 			notifyNetworkObservers(true);
-			String accessToken = Session.getActiveSession().getAccessToken();
-			URL url = new URL(
-					"https://graph.facebook.com/me/home?access_token="
-							+ accessToken);
-			InputStream is = url.openStream();
-			OutputStream os = mContext.openFileOutput(TYPE_HOMEFEED,
-					Context.MODE_PRIVATE);
-			while ((read = is.read(mBuffer)) != -1) {
-				os.write(mBuffer, 0, read);
-			}
-			is.close();
-			is = mContext.openFileInput(TYPE_HOMEFEED);
-			Scanner s = new Scanner(is).useDelimiter("\\A");
+			Request request = Request.newGraphPathRequest(
+					Session.getActiveSession(), "me/home", null);
+			Bundle parameters = new Bundle();
+			parameters.putString("fields", "id");
+			request.setParameters(parameters);
+			Response response = request.executeAndWait();
+
 			notifyNetworkObservers(false);
-			return s.hasNext() ? s.next() : "";
+
+			GraphObject graphObject = response.getGraphObject();
+			if (graphObject != null) {
+				JSONObject json = graphObject.getInnerJSONObject();
+				OutputStream os = mContext.openFileOutput(TYPE_HOMEFEED,
+						Context.MODE_PRIVATE);
+				os.write(json.toString().getBytes());
+				os.flush();
+				os.close();
+				return json;
+			}
 		} catch (Exception ex) {
 			notifyNetworkObservers(false);
 			mContext.deleteFile(TYPE_HOMEFEED);
+		}
+		return null;
+	}
+
+	public JSONObject getHomeFeedItem(String id, boolean useCache) {
+		if (useCache) {
+			try {
+				InputStream is = mContext.openFileInput(TYPE_HOMEFEEDITEM + id);
+				Scanner s = new Scanner(is).useDelimiter("\\A");
+				return new JSONObject(s.next());
+			} catch (Exception ex) {
+			}
+		}
+		try {
+			notifyNetworkObservers(true);
+			Request request = Request.newGraphPathRequest(
+					Session.getActiveSession(), id, null);
+			Response response = request.executeAndWait();
+			notifyNetworkObservers(false);
+
+			GraphObject graphObject = response.getGraphObject();
+			if (graphObject != null) {
+				JSONObject json = graphObject.getInnerJSONObject();
+				OutputStream os = mContext.openFileOutput(TYPE_HOMEFEEDITEM
+						+ id, Context.MODE_PRIVATE);
+				os.write(json.toString().getBytes());
+				os.flush();
+				os.close();
+				return json;
+			}
+		} catch (Exception ex) {
+			notifyNetworkObservers(false);
+			mContext.deleteFile(TYPE_HOMEFEEDITEM + id);
 		}
 		return null;
 	}
